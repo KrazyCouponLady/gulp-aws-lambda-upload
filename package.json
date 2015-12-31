@@ -1,0 +1,33 @@
+{
+  "name": "gulp-aws-lambda-upload",
+  "version": "1.0.0",
+  "description": "A Gulp plugin that will upload, or update existing, AWS Lambda modules that have been zipped",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KrazyCouponLady/gulp-aws-lambda-upload.git"
+  },
+  "keywords": [
+    "gulpplugin aws lambda"
+  ],
+  "author": "krazy.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/KrazyCouponLady/gulp-aws-lambda-runner/issues"
+  },
+  "homepage": "https://github.com/KrazyCouponLady/gulp-aws-lambda-runner#readme",
+  "dependencies": {
+    "aws-sdk": "^2.2.26",
+    "gulp-util": "^3.0.7",
+    "lodash": "^3.10.1",
+    "through2": "^2.0.0"
+  },
+  "devDependencies": {
+    "mocha": "^2.3.4",
+    "should": "^8.0.2",
+    "vinyl-fs": "^2.2.1"
+  }
+}
