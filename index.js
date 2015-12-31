@@ -5,10 +5,11 @@ var through = require('through2'),
 	PluginError = gutil.PluginError;
 
 module.exports = function(parameters) {
+	var PLUGIN_NAME = 'gulp_aws_lambda_upload';
 
 	// The AWS Role ARN cannot be defaulted
 	if (typeof parameters == 'undefined' || typeof parameters.role == 'undefined') {
-		throw new PluginError('Missing required parameter: role (must be a valid ARN)');
+		throw new PluginError(PLUGIN_NAME, 'Missing required parameter: role (must be a valid ARN)');
 	}
 
 	if (typeof parameters.region == 'undefined') {
@@ -17,45 +18,14 @@ module.exports = function(parameters) {
 		gutil.beep();
 	}	
 
-	// This is so that JS parameter conventions can be followed (convenience)
+	// This is so that JS parameter naming conventions can be followed (convenience)
 	var upperCaseParameters = {
 		FunctionName: parameters.functionName,
-		Handler : parameters.handler,
-		Timeout : parameters.timeout,
-		MemorySize : parameters.memorySize 
+		Handler: parameters.handler,
+		Timeout: parameters.timeout,
+		Description: parameters.description,
+		MemorySize: parameters.memorySize 
 	};
-
-	parameters = upperCaseParameters;
-
-	var PLUGIN_NAME = 'gulp_aws_lambda_upload';
-
-	function uploadToAWS(parameters, content, cb) {
-		AWS.config.region = parameters.region;
-		var lambda = new AWS.Lambda();
-
-		lambda.listFunctions({},function(err, listOfFunctions) {
-			if (err) {
-				handler.emit('error', err);
-				throw new PluginError(PLUGIN_NAME, err, {showStack: true});
-			}
-			else {
-				for (var i = 0, count = listOfFunctions.Functions.length; i < count; i++) {
-					if (listOfFunctions.Functions[i].FunctionName !== parameters.FunctionName) {
-						continue;
-					}
-					lambda.updateFunctionCode({
-						'FunctionName' : parameters.FunctionName, 
-						'ZipFile' : content
-
-					}, cb);
-					return;
-				}
-
-				parameters.Code.ZipFile = content;
-				lambda.createFunction(parameters, cb);
-			}
-		});
-	}
 
 	function getLambdaName(basePath) {
 		if (basePath[basePath.length - 1] == '/') {
@@ -74,9 +44,35 @@ module.exports = function(parameters) {
 				Description : 'AWS Lambda',
 				Timeout : 1,
 				MemorySize : 128
-			}, parameters);
+			}, upperCaseParameters),
+			emitter = this,
+			aws = parameters.aws || AWS;
 
-		uploadToAWS(_parameters, file.contents, cb);
+		aws.config.region = parameters.region;
+		var lambda = new aws.Lambda();
+
+		lambda.listFunctions({},function(err, listOfFunctions) {
+			if (err) {
+				emitter.emit('error', err);
+				throw new PluginError(PLUGIN_NAME, err, {showStack: true});
+			}
+			else {
+				for (var i = 0, count = listOfFunctions.Functions.length; i < count; i++) {
+					if (listOfFunctions.Functions[i].FunctionName !== _parameters.FunctionName) {
+						continue;
+					}
+					lambda.updateFunctionCode({
+						'FunctionName' : _parameters.FunctionName, 
+						'ZipFile' : file.contents
+
+					}, cb);
+					return;
+				}
+
+				_parameters.Code.ZipFile = file.contents;
+				lambda.createFunction(_parameters, cb);
+			}
+		});
 	}
 
 	function end(cb) {
