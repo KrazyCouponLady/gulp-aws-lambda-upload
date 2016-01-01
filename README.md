@@ -8,6 +8,10 @@ Install package with NPM, and add it to your development dependencies:
 
 ```npm install --save-dev gulp-aws-lambda-upload```
 
+## Important
+
+The AWS SDK must be set up correctly on the machine for this plugin to work:  https://aws.amazon.com/sdk-for-node-js/.
+
 ## Usage
 A sample workflow:
 
@@ -19,6 +23,48 @@ A sample workflow:
 |   +-- MyLambda
 |       +-- MyLambda.js
 |       +-- event.json
+```
+
+The following task could be used to execute a module in the above workflow (the Role ARN is obscured and needs to be set to a real ARN for this code to work).  Tasks for 'clean', 'install' and 'zip' are left to the implementers discretion--the example output shows the order that it could happen in a build server workflow. 
+
+```
+var gulp = require('gulp'),
+    path = require('path'),
+    runner = require('gulp-aws-lambda-upload');
+
+gulp.task('upload', ['zip'], function() {
+
+	return gulp.src(path.join(__dirname, 'build/*.zip'))
+			.pipe(upload({
+					role: 'arn:aws:iam::<account-id>:role/lambda_basic_execution',
+					region: 'us-west-2',
+					timeout: 10
+			}));
+});
+```
+
+### Example Output
+
+```
+$ gulp upload
+[08:15:52] Using gulpfile /path/to/gulpfile.js
+[08:15:52] Starting 'clean'...
+[08:15:52] Finished 'clean' after 7.2 ms
+[08:15:52] Starting 'install'...
+[08:15:53] Finished 'install' after 622 ms
+[08:15:53] Starting 'zip'...
+[08:15:54] Finished 'zip' after 1.06 s
+[08:15:54] Starting 'upload'...
+[08:15:54] Sending...
+{ FunctionName: 'MyLambda',
+  Handler: 'MyLambda.handler',
+  Code: { ZipFile: null },
+  Runtime: 'nodejs',
+  Description: 'AWS Lambda',
+  Timeout: 10,
+  MemorySize: 128,
+  Role: 'arn:aws:iam::<account-id>:role/lambda_basic_execution' }
+[08:16:11] Finished 'upload' after 9 s
 ```
 
 The MIT License (MIT)
