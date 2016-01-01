@@ -25,7 +25,8 @@ module.exports = function(parameters) {
 		Handler: parameters.handler,
 		Timeout: parameters.timeout,
 		Description: parameters.description,
-		MemorySize: parameters.memorySize 
+		MemorySize: parameters.memorySize,
+		Role: parameters.role
 	};
 
 	function getLambdaName(basePath) {
@@ -49,7 +50,6 @@ module.exports = function(parameters) {
 			emitter = this,
 			aws = parameters.aws || AWS;
 
-		console.log(parameters.region);
 		aws.config.region = parameters.region;
 		var lambda = new aws.Lambda();
 
