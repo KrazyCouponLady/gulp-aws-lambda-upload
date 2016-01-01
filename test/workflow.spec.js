@@ -27,9 +27,20 @@ describe('gulp-aws-lambda-upload', function() {
 		}
 	});
 
-	it('should not throw an error when a role is provided', function(done) {
+	it('should throw an error when no region is provided', function(done) {
+		try {
+			var actual = awsLambdaUpload({ role: 'arn:partition:service:region:account-id:resource' });
+			actual.end();
+			assert.fail('An exception should be thrown');
+		}
+		catch (error) {
+			done();
+		}
+	});
+
+	it('should not throw an error when a role and regions are provided', function(done) {
 		vfs.src('./test/lambda.stub.zip')
-			.pipe(awsLambdaUpload({ role: 'arn:partition:service:region:account-id:resource', aws:AWSTest }))
+			.pipe(awsLambdaUpload({ role: 'arn:partition:service:region:account-id:resource', region: 'us-west-2', aws:AWSTest }))
 			.on('error', assert.fail)
 			.on('end', done);
 	});

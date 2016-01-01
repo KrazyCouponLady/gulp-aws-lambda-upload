@@ -7,16 +7,17 @@ var through = require('through2'),
 module.exports = function(parameters) {
 	var PLUGIN_NAME = 'gulp_aws_lambda_upload';
 
-	// The AWS Role ARN cannot be defaulted
-	if (typeof parameters == 'undefined' || typeof parameters.role == 'undefined') {
+	if (typeof parameters != 'object') {
+		throw new PluginError(PLUGIN_NAME, 'Missing required parameters (object)');
+	}
+
+	if (typeof parameters.role == 'undefined') {
 		throw new PluginError(PLUGIN_NAME, 'Missing required parameter: role (must be a valid ARN)');
 	}
 
 	if (typeof parameters.region == 'undefined') {
-		parameters.region == 'us-west-2';
-		gutil.log('Warning! No region specified; using default value of "us-west-2"');
-		gutil.beep();
-	}	
+		throw new PluginError(PLUGIN_NAME, 'Missing required parameter: region');
+	}
 
 	// This is so that JS parameter naming conventions can be followed (convenience)
 	var upperCaseParameters = {
@@ -48,6 +49,7 @@ module.exports = function(parameters) {
 			emitter = this,
 			aws = parameters.aws || AWS;
 
+		console.log(parameters.region);
 		aws.config.region = parameters.region;
 		var lambda = new aws.Lambda();
 
