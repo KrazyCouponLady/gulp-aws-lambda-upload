@@ -2,6 +2,7 @@ var through = require('through2'),
 	AWS = require('aws-sdk'),
 	gutil = require('gulp-util'),
 	_ = require('lodash'),
+	util = require('util'),
 	PluginError = gutil.PluginError;
 
 module.exports = function(parameters) {
@@ -59,6 +60,8 @@ module.exports = function(parameters) {
 				throw new PluginError(PLUGIN_NAME, err, {showStack: true});
 			}
 			else {
+				gutil.log('Sending...\n', gutil.colors.gray(util.inspect(_parameters)));
+
 				for (var i = 0, count = listOfFunctions.Functions.length; i < count; i++) {
 					if (listOfFunctions.Functions[i].FunctionName !== _parameters.FunctionName) {
 						continue;
@@ -79,8 +82,10 @@ module.exports = function(parameters) {
 
 	function end(cb) {
 		this.emit('end');
+		gutil.beep();
 		cb();
 	}
 
 	return through.obj(read, end);
 };
+

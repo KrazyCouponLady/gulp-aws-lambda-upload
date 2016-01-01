@@ -9,7 +9,7 @@ module.exports = {
 		};
 
 		this.createFunction = function(options, callback) {
-			callback(null, true);
+			callback(null, options);
 		}
 	}
 }
