@@ -43,7 +43,7 @@ module.exports = function(parameters) {
 				FunctionName : name,
 				Handler : name + '.handler',
 				Code : { ZipFile : null },
-				Runtime : 'nodejs',
+				Runtime : 'nodejs4.3',
 				Description : 'AWS Lambda',
 				Timeout : 1,
 				MemorySize : 128
